@@ -65,16 +65,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Role $role = null;
 
     /**
-     * @var Collection<int, Gamer>
+     * @var Collection<int, Player>
      */
-    #[ORM\OneToMany(targetEntity: Gamer::class, mappedBy: 'user')]
-    private Collection $gamers;
+    #[ORM\OneToMany(targetEntity: Player::class, mappedBy: 'user')]
+    private Collection $players;
 
     public function __construct()
     {
         $this->quizzes = new ArrayCollection();
         $this->badges = new ArrayCollection();
-        $this->gamers = new ArrayCollection();
+        $this->players = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -278,29 +278,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Gamer>
+     * @return Collection<int, Player>
      */
-    public function getGamers(): Collection
+    public function getPlayers(): Collection
     {
-        return $this->gamers;
+        return $this->players;
     }
 
-    public function addGamer(Gamer $gamer): static
+    public function addPlayer(Player $player): static
     {
-        if (!$this->gamers->contains($gamer)) {
-            $this->gamers->add($gamer);
-            $gamer->setUser($this);
+        if (!$this->players->contains($player)) {
+            $this->players->add($player);
+            $player->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeGamer(Gamer $gamer): static
+    public function removePlayer(Player $player): static
     {
-        if ($this->gamers->removeElement($gamer)) {
+        if ($this->players->removeElement($player)) {
             // set the owning side to null (unless already changed)
-            if ($gamer->getUser() === $this) {
-                $gamer->setUser(null);
+            if ($player->getUser() === $this) {
+                $player->setUser(null);
             }
         }
 

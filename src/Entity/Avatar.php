@@ -19,14 +19,14 @@ class Avatar
     private ?string $name = null;
 
     /**
-     * @var Collection<int, Gamer>
+     * @var Collection<int, Player>
      */
-    #[ORM\ManyToMany(targetEntity: Gamer::class, mappedBy: 'avatars')]
-    private Collection $gamers;
+    #[ORM\ManyToMany(targetEntity: Player::class, mappedBy: 'avatars')]
+    private Collection $players;
 
     public function __construct()
     {
-        $this->gamers = new ArrayCollection();
+        $this->players = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -47,27 +47,27 @@ class Avatar
     }
 
     /**
-     * @return Collection<int, Gamer>
+     * @return Collection<int, Player>
      */
-    public function getGamers(): Collection
+    public function getPlayers(): Collection
     {
-        return $this->gamers;
+        return $this->players;
     }
 
-    public function addGamer(Gamer $gamer): static
+    public function addPlayer(Player $player): static
     {
-        if (!$this->gamers->contains($gamer)) {
-            $this->gamers->add($gamer);
-            $gamer->addAvatar($this);
+        if (!$this->players->contains($player)) {
+            $this->players->add($player);
+            $player->addAvatar($this);
         }
 
         return $this;
     }
 
-    public function removeGamer(Gamer $gamer): static
+    public function removePlayer(Player $player): static
     {
-        if ($this->gamers->removeElement($gamer)) {
-            $gamer->removeAvatar($this);
+        if ($this->players->removeElement($player)) {
+            $player->removeAvatar($this);
         }
 
         return $this;
