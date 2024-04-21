@@ -28,7 +28,19 @@ final class Version20240416192423 extends AbstractMigration
         $this->addSql('CREATE TABLE question (id INT AUTO_INCREMENT NOT NULL, quiz_id INT DEFAULT NULL, question VARCHAR(255) NOT NULL, INDEX IDX_B6F7494E853CD175 (quiz_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE question_response (question_id INT NOT NULL, response_id INT NOT NULL, INDEX IDX_5D73BBF71E27F6BF (question_id), INDEX IDX_5D73BBF7FBF32840 (response_id), PRIMARY KEY(question_id, response_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE quiz (id INT AUTO_INCREMENT NOT NULL, users_id INT DEFAULT NULL, title VARCHAR(100) NOT NULL, is_group TINYINT(1) NOT NULL, INDEX IDX_A412FA9267B3B43D (users_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE game (quiz_id INT NOT NULL, team_id INT NOT NULL, player_id INT NOT NULL, INDEX IDX_E115A44853CD175 (quiz_id), INDEX IDX_E115A44296CD8AE (team_id), INDEX IDX_755D8A3C99E6F5DF (player_id), PRIMARY KEY(quiz_id, team_id, player_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE game (
+            quiz_id INT NOT NULL,
+            team_id INT NOT NULL,
+            player_id INT NOT NULL,
+            game_date DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\',
+            secret_code INT NOT NULL,
+            team_score INT DEFAULT NULL,
+            player_score INT NOT NULL,
+            INDEX IDX_E115A44853CD175 (quiz_id),
+            INDEX IDX_E115A44296CD8AE (team_id),
+            INDEX IDX_755D8A3C99E6F5DF (player_id),
+            PRIMARY KEY(quiz_id, team_id, player_id, game_date)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE response (id INT AUTO_INCREMENT NOT NULL, response VARCHAR(255) NOT NULL, is_correct TINYINT(1) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE role (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(50) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE team (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');

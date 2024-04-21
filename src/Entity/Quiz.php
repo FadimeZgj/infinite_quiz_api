@@ -42,6 +42,18 @@ class Quiz
     #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'quizzes')]
     private Collection $players;
 
+    #[ORM\Column(type: "datetime_immutable")]
+    private ?\DateTimeImmutable $gameDate = null;
+
+    #[ORM\Column(type: "integer")]
+    private ?int $secretCode = null;
+
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $teamScore = null;
+
+    #[ORM\Column(type: "integer")]
+    private ?int $playerScore = null;
+
 
     public function __construct()
     {
@@ -165,6 +177,58 @@ class Quiz
     public function removePlayer(Player $player): static
     {
         $this->players->removeElement($player);
+
+        return $this;
+    }
+
+    // Getters et setters pour gameDate
+    public function getGameDate(): ?\DateTimeImmutable
+    {
+        return $this->gameDate;
+    }
+
+    public function setGameDate(?\DateTimeImmutable $gameDate): self
+    {
+        $this->gameDate = $gameDate;
+
+        return $this;
+    }
+
+    // Getters et setters pour secretCode
+    public function getSecretCode(): ?int
+    {
+        return $this->secretCode;
+    }
+
+    public function setSecretCode(?int $secretCode): self
+    {
+        $this->secretCode = $secretCode;
+
+        return $this;
+    }
+
+    // Getters et setters pour teamScore
+    public function getTeamScore(): ?int
+    {
+        return $this->teamScore;
+    }
+
+    public function setTeamScore(?int $teamScore): self
+    {
+        $this->teamScore = $teamScore;
+
+        return $this;
+    }
+
+    // Getters et setters pour playerScore
+    public function getPlayerScore(): ?int
+    {
+        return $this->playerScore;
+    }
+
+    public function setPlayerScore(?int $playerScore): self
+    {
+        $this->playerScore = $playerScore;
 
         return $this;
     }
