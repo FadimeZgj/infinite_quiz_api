@@ -6,6 +6,7 @@ use App\Repository\QuizRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
 class Quiz
@@ -13,45 +14,56 @@ class Quiz
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('quiz:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups('quiz:read')]
     private ?string $Title = null;
 
     #[ORM\Column]
+    #[Groups('quiz:read')]
     private ?bool $isGroup = null;
 
     /**
      * @var Collection<int, Question>
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz')]
+    #[Groups('quiz:read')]
     private Collection $questions;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
+    #[Groups('quiz:read')]
     private ?User $users = null;
 
     /**
      * @var Collection<int, Team>
      */
     #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'quizzes')]
+    #[Groups('quiz:read')]
     private Collection $teams;
 
     /**
      * @var Collection<int, Player>
      */
     #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'quizzes')]
+    #[Groups('quiz:read')]
     private Collection $players;
 
     #[ORM\Column(type: "datetime_immutable")]
+    #[Groups('quiz:read')]
     private ?\DateTimeImmutable $gameDate = null;
 
     #[ORM\Column(type: "integer")]
+    #[Groups('quiz:read')]
     private ?int $secretCode = null;
 
     #[ORM\Column(type: "integer", nullable: true)]
+    #[Groups('quiz:read')]
     private ?int $teamScore = null;
 
     #[ORM\Column(type: "integer")]
+    #[Groups('quiz:read')]
     private ?int $playerScore = null;
 
 
