@@ -6,6 +6,7 @@ use App\Repository\OrganizationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
 class Organization
@@ -13,12 +14,15 @@ class Organization
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('organization:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups('organization:read')]
     private ?string $name = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups('organization:read')]
     private ?string $Country = null;
 
     /**

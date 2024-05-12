@@ -6,6 +6,7 @@ use App\Repository\AvatarRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AvatarRepository::class)]
 class Avatar
@@ -13,9 +14,11 @@ class Avatar
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('avatar:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups('avatar:read')]
     private ?string $name = null;
 
     /**

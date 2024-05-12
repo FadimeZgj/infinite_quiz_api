@@ -6,6 +6,7 @@ use App\Repository\PlayerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: PlayerRepository::class)]
 class Player
@@ -13,9 +14,11 @@ class Player
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('player:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups('player:read')]
     private ?string $pseudo = null;
 
     /**
@@ -25,6 +28,7 @@ class Player
     private Collection $avatars;
 
     #[ORM\ManyToOne(inversedBy: 'players')]
+    #[Groups('player:read')]
     private ?User $user = null;
 
     /**
@@ -37,6 +41,7 @@ class Player
      * @var Collection<int, Team>
      */
     #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'players')]
+    #[ORM\JoinTable(name: 'game')]
     private Collection $teams;
 
 
