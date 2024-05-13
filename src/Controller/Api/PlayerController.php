@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Avatar;
 use App\Entity\Player;
 use App\Repository\PlayerRepository;
 use OpenApi\Attributes as OA;
@@ -70,6 +71,17 @@ class PlayerController extends AbstractController
             $player->setPseudo($data['pseudo']);
             $player->setUser($user);
 
+            // Ajouter des avatars s'ils sont fournis
+            if (isset($data['avatars']) && is_array($data['avatars'])) {
+                foreach ($data['avatars'] as $avatarId) {
+                    // Récupérer l'avatar à partir de l'ID
+                    $avatar = $em->getRepository(Avatar::class)->find($avatarId);
+                    if ($avatar) {
+                        $player->addAvatar($avatar);
+                    }
+                }
+            }
+
             $em->persist($player);
             $em->flush();
 
@@ -99,6 +111,17 @@ class PlayerController extends AbstractController
             // On traite les données pour créer une nouvelle Structure
             $player->setPseudo($data['pseudo']);
 
+            // Ajouter les nouveaux avatars associés au joueur
+            if (isset($data['avatars']) && is_array($data['avatars'])) {
+                foreach ($data['avatars'] as $avatarId) {
+                    // Récupérer l'avatar à partir de l'ID
+                    $avatar = $em->getRepository(Avatar::class)->find($avatarId);
+                    if ($avatar) {
+                        $player->addAvatar($avatar);
+                    }
+                }
+            }
+
             $em->persist($player);
             $em->flush();
 
@@ -117,6 +140,7 @@ class PlayerController extends AbstractController
     #[OA\Tag(name: 'Joueurs')]
     public function delete(Player $player, EntityManagerInterface $em): JsonResponse
     {
+
         $em->remove($player);
         $em->flush();
 

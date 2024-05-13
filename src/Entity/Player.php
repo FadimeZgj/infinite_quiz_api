@@ -25,6 +25,7 @@ class Player
      * @var Collection<int, Avatar>
      */
     #[ORM\ManyToMany(targetEntity: Avatar::class, inversedBy: 'players')]
+    #[Groups('player:read')]
     private Collection $avatars;
 
     #[ORM\ManyToOne(inversedBy: 'players')]

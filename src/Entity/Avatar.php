@@ -18,7 +18,7 @@ class Avatar
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('avatar:read')]
+    #[Groups(['avatar:read', 'player:read'])]
     private ?string $name = null;
 
     /**

@@ -18,11 +18,11 @@ class Response
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups('response:read')]
+    #[Groups(['response:read', 'question:read'])]
     private ?string $response = null;
 
     #[ORM\Column]
-    #[Groups('response:read')]
+    #[Groups(['response:read', 'question:read'])]
     private ?bool $isCorrect = null;
 
     /**

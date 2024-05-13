@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Question;
 use App\Entity\Quiz;
+use App\Entity\Response;
 use App\Repository\QuestionRepository;
 use OpenApi\Attributes as OA;
 use Doctrine\ORM\EntityManagerInterface;
@@ -74,6 +75,17 @@ class QuestionController extends AbstractController
             // Associer la question au quiz
             $question->setQuiz($quiz);
 
+            // Ajouter des réponses si elles sont fournies
+            if (isset($data['responses']) && is_array($data['responses'])) {
+                foreach ($data['responses'] as $responseId) {
+                    // Récupérer la réponses à partir de l'ID
+                    $response = $em->getRepository(Response::class)->find($responseId);
+                    if ($response) {
+                        $question->addResponse($response);
+                    }
+                }
+            }
+
             $em->persist($question);
             $em->flush();
 
@@ -96,14 +108,27 @@ class QuestionController extends AbstractController
         EntityManagerInterface $em,
     ): JsonResponse {
         try {
-            // On recupère les données du corps de la requête
-            // Que l'on transforme ensuite en tableau associatif
+            // On récupère les données de la requête
             $data = json_decode($request->getContent(), true);
 
-            // On traite les données pour créer une nouvelle Equipe
+            // Mettre à jour la question
             $question->setQuestion($data['question']);
 
-            $em->persist($question);
+            // Mettre à jour les réponses associées à la question
+            foreach ($question->getResponses() as $response) {
+                // On récupère l'ID de la réponse dans les données de la requête
+                $responseId = $response->getId();
+
+                // On vérifie si la réponse existe dans les données de la requête
+                if (isset($data['responses'][$responseId])) {
+                    // Mettre à jour les données de la réponse avec celles de la requête
+                    $responseData = $data['responses'][$responseId];
+                    $response->setResponse($responseData['response']);
+                    $response->setCorrect($responseData['is_correct']);
+                }
+            }
+
+            // Persister les changements dans la base de données
             $em->flush();
 
             return $this->json($question, context: [

@@ -65,6 +65,7 @@ class QuizController extends AbstractController
             // Que l'on transforme ensuite en tableau associatif
             $data = json_decode($request->getContent(), true);
 
+
             // On traite les données pour créer un nouveau Quiz
             $quiz = new Quiz();
             $quiz->setTitle($data['title']);

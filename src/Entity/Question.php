@@ -25,6 +25,7 @@ class Question
      * @var Collection<int, Response>
      */
     #[ORM\ManyToMany(targetEntity: Response::class, inversedBy: 'questions')]
+    #[Groups(['question:read'])]
     private Collection $responses;
 
     #[ORM\ManyToOne(inversedBy: 'questions')]

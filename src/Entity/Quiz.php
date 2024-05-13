@@ -42,7 +42,6 @@ class Quiz
      */
     #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'quizzes')]
     #[ORM\JoinTable(name: 'game')]
-    #[Groups('quiz:read')]
     private Collection $teams;
 
     /**
@@ -50,7 +49,6 @@ class Quiz
      */
     #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'quizzes')]
     #[ORM\JoinTable(name: 'game')]
-    #[Groups('quiz:read')]
     private Collection $players;
 
 
