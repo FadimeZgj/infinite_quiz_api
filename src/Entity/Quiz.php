@@ -2,61 +2,55 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\QuizRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
+#[ApiResource]
 class Quiz
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('quiz:read')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
-    #[Groups('quiz:read')]
-    private ?string $Title = null;
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
 
     #[ORM\Column]
-    #[Groups('quiz:read')]
     private ?bool $isGroup = null;
+
+    #[ORM\ManyToOne(inversedBy: 'quiz')]
+    private ?User $user = null;
 
     /**
      * @var Collection<int, Question>
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz')]
-    #[Groups('quiz:read')]
-    private Collection $questions;
-
-    #[ORM\ManyToOne(inversedBy: 'quizzes')]
-    #[Groups('quiz:read')]
-    private ?User $users = null;
-
-
-    /**
-     * @var Collection<int, Team>
-     */
-    #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'quizzes')]
-    #[ORM\JoinTable(name: 'game')]
-    private Collection $teams;
+    private Collection $question;
 
     /**
      * @var Collection<int, Player>
      */
     #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'quizzes')]
-    #[ORM\JoinTable(name: 'game')]
-    private Collection $players;
+    #[ORM\JoinTable(name: "game")]
+    private Collection $player;
 
+    /**
+     * @var Collection<int, Team>
+     */
+    #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'quizzes')]
+    #[ORM\JoinTable(name: "game")]
+    private Collection $team;
 
     public function __construct()
     {
-        $this->questions = new ArrayCollection();
-        $this->teams = new ArrayCollection();
-        $this->players = new ArrayCollection();
+        $this->question = new ArrayCollection();
+        $this->player = new ArrayCollection();
+        $this->team = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -66,12 +60,12 @@ class Quiz
 
     public function getTitle(): ?string
     {
-        return $this->Title;
+        return $this->title;
     }
 
-    public function setTitle(string $Title): static
+    public function setTitle(string $title): static
     {
-        $this->Title = $Title;
+        $this->title = $title;
 
         return $this;
     }
@@ -88,18 +82,30 @@ class Quiz
         return $this;
     }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Question>
      */
-    public function getQuestions(): Collection
+    public function getQuestion(): Collection
     {
-        return $this->questions;
+        return $this->question;
     }
 
     public function addQuestion(Question $question): static
     {
-        if (!$this->questions->contains($question)) {
-            $this->questions->add($question);
+        if (!$this->question->contains($question)) {
+            $this->question->add($question);
             $question->setQuiz($this);
         }
 
@@ -108,7 +114,7 @@ class Quiz
 
     public function removeQuestion(Question $question): static
     {
-        if ($this->questions->removeElement($question)) {
+        if ($this->question->removeElement($question)) {
             // set the owning side to null (unless already changed)
             if ($question->getQuiz() === $this) {
                 $question->setQuiz(null);
@@ -118,54 +124,18 @@ class Quiz
         return $this;
     }
 
-    public function getUsers(): ?User
-    {
-        return $this->users;
-    }
-
-    public function setUsers(?User $users): static
-    {
-        $this->users = $users;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Team>
-     */
-    public function getTeams(): Collection
-    {
-        return $this->teams;
-    }
-
-    public function addTeam(Team $team): static
-    {
-        if (!$this->teams->contains($team)) {
-            $this->teams->add($team);
-        }
-
-        return $this;
-    }
-
-    public function removeTeam(Team $team): static
-    {
-        $this->teams->removeElement($team);
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Player>
      */
-    public function getPlayers(): Collection
+    public function getPlayer(): Collection
     {
-        return $this->players;
+        return $this->player;
     }
 
     public function addPlayer(Player $player): static
     {
-        if (!$this->players->contains($player)) {
-            $this->players->add($player);
+        if (!$this->player->contains($player)) {
+            $this->player->add($player);
         }
 
         return $this;
@@ -173,7 +143,31 @@ class Quiz
 
     public function removePlayer(Player $player): static
     {
-        $this->players->removeElement($player);
+        $this->player->removeElement($player);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeam(): Collection
+    {
+        return $this->team;
+    }
+
+    public function addTeam(Team $team): static
+    {
+        if (!$this->team->contains($team)) {
+            $this->team->add($team);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): static
+    {
+        $this->team->removeElement($team);
 
         return $this;
     }

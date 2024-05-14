@@ -2,38 +2,36 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\QuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
+#[ApiResource]
 class Question
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('question:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['question:read', 'quiz:read'])]
     private ?string $question = null;
+
+    #[ORM\ManyToOne(inversedBy: 'question')]
+    private ?Quiz $quiz = null;
 
     /**
      * @var Collection<int, Response>
      */
     #[ORM\ManyToMany(targetEntity: Response::class, inversedBy: 'questions')]
-    #[Groups(['question:read'])]
-    private Collection $responses;
-
-    #[ORM\ManyToOne(inversedBy: 'questions')]
-    private ?Quiz $quiz = null;
+    private Collection $response;
 
     public function __construct()
     {
-        $this->responses = new ArrayCollection();
+        $this->response = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -53,30 +51,6 @@ class Question
         return $this;
     }
 
-    /**
-     * @return Collection<int, Response>
-     */
-    public function getResponses(): Collection
-    {
-        return $this->responses;
-    }
-
-    public function addResponse(Response $response): static
-    {
-        if (!$this->responses->contains($response)) {
-            $this->responses->add($response);
-        }
-
-        return $this;
-    }
-
-    public function removeResponse(Response $response): static
-    {
-        $this->responses->removeElement($response);
-
-        return $this;
-    }
-
     public function getQuiz(): ?Quiz
     {
         return $this->quiz;
@@ -85,6 +59,30 @@ class Question
     public function setQuiz(?Quiz $quiz): static
     {
         $this->quiz = $quiz;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Response>
+     */
+    public function getResponse(): Collection
+    {
+        return $this->response;
+    }
+
+    public function addResponse(Response $response): static
+    {
+        if (!$this->response->contains($response)) {
+            $this->response->add($response);
+        }
+
+        return $this;
+    }
+
+    public function removeResponse(Response $response): static
+    {
+        $this->response->removeElement($response);
 
         return $this;
     }

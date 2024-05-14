@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -34,50 +33,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column(length: 50)]
-    #[Groups(['quiz:read', 'player:read'])]
-    private ?string $firstname = null;
+    #[ORM\ManyToOne(inversedBy: 'user')]
+    private ?Organization $organization = null;
 
-    #[ORM\Column(length: 50)]
-    #[Groups(['quiz:read', 'player:read'])]
-    private ?string $lastname = null;
-
-    #[ORM\Column(length: 100, nullable: true)]
-    private ?string $service = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $job = null;
-
-    /**
-     * @var Collection<int, Quiz>
-     */
-    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'users')]
-    private Collection $quizzes;
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Role $role = null;
 
     /**
      * @var Collection<int, Badge>
      */
     #[ORM\ManyToMany(targetEntity: Badge::class, inversedBy: 'users')]
-    private Collection $badges;
+    private Collection $badge;
 
-    #[ORM\ManyToOne(inversedBy: 'users')]
-    private ?Organization $organizations = null;
-
-    #[ORM\ManyToOne(inversedBy: 'users')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Role $role = null;
+    /**
+     * @var Collection<int, Quiz>
+     */
+    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'user')]
+    private Collection $quiz;
 
     /**
      * @var Collection<int, Player>
      */
     #[ORM\OneToMany(targetEntity: Player::class, mappedBy: 'user')]
-    private Collection $players;
+    private Collection $player;
 
     public function __construct()
     {
-        $this->quizzes = new ArrayCollection();
-        $this->badges = new ArrayCollection();
-        $this->players = new ArrayCollection();
+        $this->badge = new ArrayCollection();
+        $this->quiz = new ArrayCollection();
+        $this->player = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -109,6 +93,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @see UserInterface
+     *
      * @return list<string>
      */
     public function getRoles(): array
@@ -154,116 +139,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getFirstname(): ?string
+    public function getOrganization(): ?Organization
     {
-        return $this->firstname;
+        return $this->organization;
     }
 
-    public function setFirstname(string $firstname): static
+    public function setOrganization(?Organization $organization): static
     {
-        $this->firstname = $firstname;
-
-        return $this;
-    }
-
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname(string $lastname): static
-    {
-        $this->lastname = $lastname;
-
-        return $this;
-    }
-
-    public function getService(): ?string
-    {
-        return $this->service;
-    }
-
-    public function setService(string $service): static
-    {
-        $this->service = $service;
-
-        return $this;
-    }
-
-    public function getJob(): ?string
-    {
-        return $this->job;
-    }
-
-    public function setJob(?string $job): static
-    {
-        $this->job = $job;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Quiz>
-     */
-    public function getQuizzes(): Collection
-    {
-        return $this->quizzes;
-    }
-
-    public function addQuiz(Quiz $quiz): static
-    {
-        if (!$this->quizzes->contains($quiz)) {
-            $this->quizzes->add($quiz);
-            $quiz->setUsers($this);
-        }
-
-        return $this;
-    }
-
-    public function removeQuiz(Quiz $quiz): static
-    {
-        if ($this->quizzes->removeElement($quiz)) {
-            // set the owning side to null (unless already changed)
-            if ($quiz->getUsers() === $this) {
-                $quiz->setUsers(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Badge>
-     */
-    public function getBadges(): Collection
-    {
-        return $this->badges;
-    }
-
-    public function addBadge(Badge $badge): static
-    {
-        if (!$this->badges->contains($badge)) {
-            $this->badges->add($badge);
-        }
-
-        return $this;
-    }
-
-    public function removeBadge(Badge $badge): static
-    {
-        $this->badges->removeElement($badge);
-
-        return $this;
-    }
-
-    public function getOrganizations(): ?Organization
-    {
-        return $this->organizations;
-    }
-
-    public function setOrganizations(?Organization $organizations): static
-    {
-        $this->organizations = $organizations;
+        $this->organization = $organization;
 
         return $this;
     }
@@ -281,17 +164,71 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return Collection<int, Badge>
+     */
+    public function getBadge(): Collection
+    {
+        return $this->badge;
+    }
+
+    public function addBadge(Badge $badge): static
+    {
+        if (!$this->badge->contains($badge)) {
+            $this->badge->add($badge);
+        }
+
+        return $this;
+    }
+
+    public function removeBadge(Badge $badge): static
+    {
+        $this->badge->removeElement($badge);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Quiz>
+     */
+    public function getQuiz(): Collection
+    {
+        return $this->quiz;
+    }
+
+    public function addQuiz(Quiz $quiz): static
+    {
+        if (!$this->quiz->contains($quiz)) {
+            $this->quiz->add($quiz);
+            $quiz->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuiz(Quiz $quiz): static
+    {
+        if ($this->quiz->removeElement($quiz)) {
+            // set the owning side to null (unless already changed)
+            if ($quiz->getUser() === $this) {
+                $quiz->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, Player>
      */
-    public function getPlayers(): Collection
+    public function getPlayer(): Collection
     {
-        return $this->players;
+        return $this->player;
     }
 
     public function addPlayer(Player $player): static
     {
-        if (!$this->players->contains($player)) {
-            $this->players->add($player);
+        if (!$this->player->contains($player)) {
+            $this->player->add($player);
             $player->setUser($this);
         }
 
@@ -300,7 +237,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removePlayer(Player $player): static
     {
-        if ($this->players->removeElement($player)) {
+        if ($this->player->removeElement($player)) {
             // set the owning side to null (unless already changed)
             if ($player->getUser() === $this) {
                 $player->setUser(null);

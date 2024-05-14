@@ -8,11 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Player>
- *
- * @method Player|null find($id, $lockMode = null, $lockVersion = null)
- * @method Player|null findOneBy(array $criteria, array $orderBy = null)
- * @method Player[]    findAll()
- * @method Player[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class PlayerRepository extends ServiceEntityRepository
 {
@@ -26,10 +21,10 @@ class PlayerRepository extends ServiceEntityRepository
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
+    //        return $this->createQueryBuilder('p')
+    //            ->andWhere('p.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
+    //            ->orderBy('p.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
@@ -38,8 +33,8 @@ class PlayerRepository extends ServiceEntityRepository
 
     //    public function findOneBySomeField($value): ?Player
     //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
+    //        return $this->createQueryBuilder('p')
+    //            ->andWhere('p.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

@@ -2,29 +2,31 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BadgeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: BadgeRepository::class)]
+#[ApiResource]
 class Badge
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('badge:read')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
-    #[Groups('badge:read')]
+    #[ORM\Column(length: 50)]
     private ?string $name = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $url = null;
 
     /**
      * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'badges')]
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'badge')]
     private Collection $users;
 
     public function __construct()
@@ -45,6 +47,18 @@ class Badge
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(string $url): static
+    {
+        $this->url = $url;
 
         return $this;
     }
