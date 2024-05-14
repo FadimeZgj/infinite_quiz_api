@@ -25,6 +25,7 @@ class Badge
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'badges')]
+    #[Groups('badge:read')]
     private Collection $users;
 
     public function __construct()

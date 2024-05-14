@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Badge;
+use App\Entity\User;
 use App\Repository\BadgeRepository;
 use OpenApi\Attributes as OA;
 use Doctrine\ORM\EntityManagerInterface;
@@ -92,6 +93,17 @@ class BadgeController extends AbstractController
 
             // On traite les données pour créer un nouveau Badge
             $badge->setName($data['name']);
+
+            // Ajouter les nouveaux utilisateurs associés au badge
+            if (isset($data['users']) && is_array($data['users'])) {
+                foreach ($data['users'] as $userId) {
+                    // Récupérer l'utilisateur à partir de l'ID
+                    $user = $em->getRepository(User::class)->find($userId);
+                    if ($user) {
+                        $badge->addUser($user);
+                    }
+                }
+            }
 
             $em->persist($badge);
             $em->flush();
