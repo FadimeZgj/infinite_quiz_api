@@ -24,14 +24,14 @@ class Team
      * @var Collection<int, Player>
      */
     #[ORM\ManyToMany(targetEntity: Player::class, mappedBy: 'team')]
-    #[ORM\JoinTable(name: "game")]
+    //#[ORM\JoinTable(name: "game")]
     private Collection $players;
 
     /**
      * @var Collection<int, Quiz>
      */
     #[ORM\ManyToMany(targetEntity: Quiz::class, mappedBy: 'team')]
-    #[ORM\JoinTable(name: "game")]
+    //#[ORM\JoinTable(name: "game")]
     private Collection $quizzes;
 
     public function __construct()

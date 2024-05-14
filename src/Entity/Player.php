@@ -20,8 +20,10 @@ class Player
     #[ORM\Column(length: 50)]
     private ?string $pseudo = null;
 
+
     #[ORM\ManyToOne(inversedBy: 'player')]
     private ?User $user = null;
+
 
     #[ORM\ManyToOne(inversedBy: 'players')]
     private ?Avatar $avatar = null;
@@ -37,7 +39,7 @@ class Player
      * @var Collection<int, Quiz>
      */
     #[ORM\ManyToMany(targetEntity: Quiz::class, mappedBy: 'player')]
-    #[ORM\JoinTable(name: "game")]
+    //#[ORM\JoinTable(name: "game")]
     private Collection $quizzes;
 
     public function __construct()

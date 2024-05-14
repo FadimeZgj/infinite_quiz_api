@@ -57,6 +57,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Player::class, mappedBy: 'user')]
     private Collection $player;
 
+    #[ORM\Column(length: 50)]
+    private ?string $firstname = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $lastname = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $service = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $job = null;
+
     public function __construct()
     {
         $this->badge = new ArrayCollection();
@@ -243,6 +255,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $player->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): static
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(string $lastname): static
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function getService(): ?string
+    {
+        return $this->service;
+    }
+
+    public function setService(?string $service): static
+    {
+        $this->service = $service;
+
+        return $this;
+    }
+
+    public function getJob(): ?string
+    {
+        return $this->job;
+    }
+
+    public function setJob(?string $job): static
+    {
+        $this->job = $job;
 
         return $this;
     }
