@@ -2,29 +2,31 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AvatarRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AvatarRepository::class)]
+#[ApiResource]
 class Avatar
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('avatar:read')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
-    #[Groups(['avatar:read', 'player:read'])]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $url = null;
 
     /**
      * @var Collection<int, Player>
      */
-    #[ORM\ManyToMany(targetEntity: Player::class, mappedBy: 'avatars')]
+    #[ORM\OneToMany(targetEntity: Player::class, mappedBy: 'avatar')]
     private Collection $players;
 
     public function __construct()
@@ -49,6 +51,18 @@ class Avatar
         return $this;
     }
 
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(string $url): static
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Player>
      */
@@ -61,7 +75,7 @@ class Avatar
     {
         if (!$this->players->contains($player)) {
             $this->players->add($player);
-            $player->addAvatar($this);
+            $player->setAvatar($this);
         }
 
         return $this;
@@ -70,7 +84,10 @@ class Avatar
     public function removePlayer(Player $player): static
     {
         if ($this->players->removeElement($player)) {
-            $player->removeAvatar($this);
+            // set the owning side to null (unless already changed)
+            if ($player->getAvatar() === $this) {
+                $player->setAvatar(null);
+            }
         }
 
         return $this;

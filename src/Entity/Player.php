@@ -2,55 +2,50 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PlayerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: PlayerRepository::class)]
+#[ApiResource]
 class Player
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('player:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('player:read')]
     private ?string $pseudo = null;
 
-    /**
-     * @var Collection<int, Avatar>
-     */
-    #[ORM\ManyToMany(targetEntity: Avatar::class, inversedBy: 'players')]
-    #[Groups('player:read')]
-    private Collection $avatars;
 
-    #[ORM\ManyToOne(inversedBy: 'players')]
-    #[Groups('player:read')]
+    #[ORM\ManyToOne(inversedBy: 'player')]
     private ?User $user = null;
 
-    /**
-     * @var Collection<int, Quiz>
-     */
-    #[ORM\ManyToMany(targetEntity: Quiz::class, mappedBy: 'players')]
-    private Collection $quizzes;
+
+    #[ORM\ManyToOne(inversedBy: 'players')]
+    private ?Avatar $avatar = null;
 
     /**
      * @var Collection<int, Team>
      */
     #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'players')]
-    #[ORM\JoinTable(name: 'game')]
-    private Collection $teams;
+    #[ORM\JoinTable(name: "game")]
+    private Collection $team;
 
+    /**
+     * @var Collection<int, Quiz>
+     */
+    #[ORM\ManyToMany(targetEntity: Quiz::class, mappedBy: 'player')]
+    //#[ORM\JoinTable(name: "game")]
+    private Collection $quizzes;
 
     public function __construct()
     {
-        $this->avatars = new ArrayCollection();
+        $this->team = new ArrayCollection();
         $this->quizzes = new ArrayCollection();
-        $this->teams = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -70,30 +65,6 @@ class Player
         return $this;
     }
 
-    /**
-     * @return Collection<int, Avatar>
-     */
-    public function getAvatars(): Collection
-    {
-        return $this->avatars;
-    }
-
-    public function addAvatar(Avatar $avatar): static
-    {
-        if (!$this->avatars->contains($avatar)) {
-            $this->avatars->add($avatar);
-        }
-
-        return $this;
-    }
-
-    public function removeAvatar(Avatar $avatar): static
-    {
-        $this->avatars->removeElement($avatar);
-
-        return $this;
-    }
-
     public function getUser(): ?User
     {
         return $this->user;
@@ -102,6 +73,42 @@ class Player
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?Avatar
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?Avatar $avatar): static
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeam(): Collection
+    {
+        return $this->team;
+    }
+
+    public function addTeam(Team $team): static
+    {
+        if (!$this->team->contains($team)) {
+            $this->team->add($team);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): static
+    {
+        $this->team->removeElement($team);
 
         return $this;
     }
@@ -129,30 +136,6 @@ class Player
         if ($this->quizzes->removeElement($quiz)) {
             $quiz->removePlayer($this);
         }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Team>
-     */
-    public function getTeams(): Collection
-    {
-        return $this->teams;
-    }
-
-    public function addTeam(Team $team): static
-    {
-        if (!$this->teams->contains($team)) {
-            $this->teams->add($team);
-        }
-
-        return $this;
-    }
-
-    public function removeTeam(Team $team): static
-    {
-        $this->teams->removeElement($team);
 
         return $this;
     }

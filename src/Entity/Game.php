@@ -2,47 +2,86 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\GameRepository;
-use DateTime;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
+use DateTimeImmutable;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: GameRepository::class)]
+#[ApiResource(operations: [
+    new Get(
+        uriTemplate: '/games/{quizId}/{teamId}/{playerId}/{uuid}',
+        //requirements: ['quizId' => '\d+', 'teamId' => '\d+', 'playerId' => '\d+', 'uuid' => '[a-zA-Z0-9]+']
+    ),
+    new Put(
+        uriTemplate: '/games/{quizId}/{teamId}/{playerId}/{uuid}',
+        //requirements: ['quizId' => '\d+', 'teamId' => '\d+', 'playerId' => '\d+', 'uuid' => '[a-zA-Z0-9]+']
+    ),
+    new Patch(
+        uriTemplate: '/games/{quizId}/{teamId}/{playerId}/{uuid}',
+        //requirements: ['quizId' => '\d+', 'teamId' => '\d+', 'playerId' => '\d+', 'uuid' => '[a-zA-Z0-9]+']
+    ),
+    new Delete(
+        uriTemplate: '/games/{quizId}/{teamId}/{playerId}/{uuid}',
+        //requirements: ['quizId' => '\d+', 'teamId' => '\d+', 'playerId' => '\d+', 'uuid' => '[a-zA-Z0-9]+']
+    ),
+    new GetCollection(),
+    new Post(),
+
+])]
+//#[ApiResource]
+
 class Game
 {
 
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
-    #[Groups('game:read')]
+    #[ApiProperty(identifier: true)]
     private ?int $quizId = null;
 
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
-    #[Groups('game:read')]
+    #[ApiProperty(identifier: true)]
     private ?int $teamId = null;
 
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
-    #[Groups('game:read')]
+    #[ApiProperty(identifier: true)]
     private ?int $playerId = null;
 
+    /**
+     * @var Uuid
+     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'string')]
+    #[ApiProperty(identifier: true)]
+    private ?string $uuid = null;
+
     #[ORM\Column(type: "datetime_immutable")]
-    #[Groups('game:read')]
     private ?\DateTimeImmutable $gameDate = null;
 
     #[ORM\Column(type: "integer")]
-    #[Groups('game:read')]
     private ?int $secretCode = null;
 
     #[ORM\Column(type: "integer", nullable: true)]
-    #[Groups('game:read')]
     private ?int $teamScore = null;
 
     #[ORM\Column(type: "integer")]
-    #[Groups('game:read')]
     private ?int $playerScore = null;
+
+    public function __construct()
+    {
+        $this->uuid = Uuid::v4()->__toString();
+        $this->gameDate = new DateTimeImmutable();
+    }
 
     /**
      * Get the value of gameDate
@@ -67,7 +106,7 @@ class Game
     /**
      * Get the value of secretCode
      */
-    public function getSecretCode()
+    public function getSecretCode(): ?int
     {
         return $this->secretCode;
     }
@@ -87,7 +126,7 @@ class Game
     /**
      * Get the value of teamScore
      */
-    public function getTeamScore()
+    public function getTeamScore(): ?int
     {
         return $this->teamScore;
     }
@@ -107,7 +146,7 @@ class Game
     /**
      * Get the value of playerScore
      */
-    public function getPlayerScore()
+    public function getPlayerScore(): ?int
     {
         return $this->playerScore;
     }
@@ -127,7 +166,7 @@ class Game
     /**
      * Get the value of quizId
      */
-    public function getQuizId()
+    public function getQuizId(): ?int
     {
         return $this->quizId;
     }
@@ -147,7 +186,7 @@ class Game
     /**
      * Get the value of teamId
      */
-    public function getTeamId()
+    public function getTeamId(): ?int
     {
         return $this->teamId;
     }
@@ -167,7 +206,7 @@ class Game
     /**
      * Get the value of playerId
      */
-    public function getPlayerId()
+    public function getPlayerId(): ?int
     {
         return $this->playerId;
     }
@@ -180,6 +219,26 @@ class Game
     public function setPlayerId($playerId)
     {
         $this->playerId = $playerId;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of uuid
+     */
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * Set the value of uuid
+     *
+     * @return  self
+     */
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
 
         return $this;
     }

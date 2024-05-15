@@ -2,33 +2,31 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ResponseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ResponseRepository::class)]
+#[ApiResource]
 class Response
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('response:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['response:read', 'question:read'])]
     private ?string $response = null;
 
     #[ORM\Column]
-    #[Groups(['response:read', 'question:read'])]
     private ?bool $isCorrect = null;
 
     /**
      * @var Collection<int, Question>
      */
-    #[ORM\ManyToMany(targetEntity: Question::class, mappedBy: 'responses')]
+    #[ORM\ManyToMany(targetEntity: Question::class, mappedBy: 'response')]
     private Collection $questions;
 
     public function __construct()

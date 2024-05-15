@@ -2,38 +2,36 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\OrganizationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
+#[ApiResource]
 class Organization
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('organization:read')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
-    #[Groups('organization:read')]
+    #[ORM\Column(length: 50)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 50)]
-    #[Groups('organization:read')]
-    private ?string $Country = null;
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $country = null;
 
     /**
      * @var Collection<int, User>
      */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'organizations')]
-    private Collection $users;
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'organization')]
+    private Collection $user;
 
     public function __construct()
     {
-        $this->users = new ArrayCollection();
+        $this->user = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -55,12 +53,12 @@ class Organization
 
     public function getCountry(): ?string
     {
-        return $this->Country;
+        return $this->country;
     }
 
-    public function setCountry(string $Country): static
+    public function setCountry(?string $country): static
     {
-        $this->Country = $Country;
+        $this->country = $country;
 
         return $this;
     }
@@ -68,16 +66,16 @@ class Organization
     /**
      * @return Collection<int, User>
      */
-    public function getUsers(): Collection
+    public function getUser(): Collection
     {
-        return $this->users;
+        return $this->user;
     }
 
     public function addUser(User $user): static
     {
-        if (!$this->users->contains($user)) {
-            $this->users->add($user);
-            $user->setOrganizations($this);
+        if (!$this->user->contains($user)) {
+            $this->user->add($user);
+            $user->setOrganization($this);
         }
 
         return $this;
@@ -85,10 +83,10 @@ class Organization
 
     public function removeUser(User $user): static
     {
-        if ($this->users->removeElement($user)) {
+        if ($this->user->removeElement($user)) {
             // set the owning side to null (unless already changed)
-            if ($user->getOrganizations() === $this) {
-                $user->setOrganizations(null);
+            if ($user->getOrganization() === $this) {
+                $user->setOrganization(null);
             }
         }
 
