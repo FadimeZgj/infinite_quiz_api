@@ -30,6 +30,7 @@ final class Version20240514173940 extends AbstractMigration
             quiz_id INT NOT NULL,
             team_id INT NOT NULL,
             player_id INT NOT NULL,
+            uuid VARCHAR(255) NOT NULL,
             game_date DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\',
             secret_code INT NOT NULL,
             team_score INT DEFAULT NULL,
@@ -37,7 +38,7 @@ final class Version20240514173940 extends AbstractMigration
             INDEX IDX_E115A44853CD175 (quiz_id),
             INDEX IDX_232B318C296CD8AE (team_id),
             INDEX IDX_232B318C99E6F5DF (player_id),
-            PRIMARY KEY(quiz_id, team_id, player_id, game_date)
+            PRIMARY KEY(quiz_id, team_id, player_id, uuid)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
 
         $this->addSql('CREATE TABLE question (id INT AUTO_INCREMENT NOT NULL, quiz_id INT DEFAULT NULL, question VARCHAR(255) NOT NULL, INDEX IDX_B6F7494E853CD175 (quiz_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
