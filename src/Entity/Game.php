@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\GameController;
 use App\Repository\GameRepository;
 use Doctrine\ORM\Mapping as ORM;
 use DateTimeImmutable;
@@ -23,6 +24,7 @@ use Symfony\Component\Uid\Uuid;
     ),
     new Put(
         uriTemplate: '/games/{quizId}/{teamId}/{playerId}/{uuid}',
+        controller: GameController::class . '::updateGame'
         //requirements: ['quizId' => '\d+', 'teamId' => '\d+', 'playerId' => '\d+', 'uuid' => '[a-zA-Z0-9]+']
     ),
     new Patch(
@@ -57,9 +59,6 @@ class Game
     #[ApiProperty(identifier: true)]
     private ?int $playerId = null;
 
-    /**
-     * @var Uuid
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'string')]
     #[ApiProperty(identifier: true)]
