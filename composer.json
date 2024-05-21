@@ -1,4 +1,6 @@
 {
+    "name": "infinite_quiz/project",
+    "description": "Application de quiz",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
