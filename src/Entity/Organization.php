@@ -23,6 +23,7 @@ class Organization
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\NotBlank]
     private ?string $country = null;
 
     /**

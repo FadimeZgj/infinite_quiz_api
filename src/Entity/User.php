@@ -57,6 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank]
     private array $roles = [];
 
     /**
@@ -100,10 +101,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 50)]
     #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 50)]
     #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 50, nullable: true)]

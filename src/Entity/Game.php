@@ -15,6 +15,7 @@ use App\Repository\GameRepository;
 use Doctrine\ORM\Mapping as ORM;
 use DateTimeImmutable;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GameRepository::class)]
 #[ApiResource(operations: [
@@ -65,15 +66,18 @@ class Game
     private ?string $uuid = null;
 
     #[ORM\Column(type: "datetime_immutable")]
+    #[Assert\NotBlank]
     private ?\DateTimeImmutable $gameDate = null;
 
     #[ORM\Column(type: "integer")]
+    #[Assert\NotBlank]
     private ?int $secretCode = null;
 
     #[ORM\Column(type: "integer", nullable: true)]
     private ?int $teamScore = null;
 
     #[ORM\Column(type: "integer")]
+    #[Assert\NotBlank]
     private ?int $playerScore = null;
 
     public function __construct()
