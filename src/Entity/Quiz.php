@@ -24,7 +24,7 @@ class Quiz
     private ?string $title = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank]
+    // #[Assert\NotBlank]
     private ?bool $isGroup = null;
 
     #[ORM\ManyToOne(inversedBy: 'quiz')]
