@@ -23,7 +23,6 @@ class Response
     private ?string $response = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank]
     private ?bool $isCorrect = null;
 
     /**
