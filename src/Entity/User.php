@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(),
         new Post(processor: UserPasswordHasher::class, validationContext: ['groups' => ['Default', 'user:create']]),
-        new Get(),
+        new Get(validationContext: ['groups' => ['Default', 'user:read']]),
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),
         new Delete(),
@@ -57,8 +57,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     #[Groups(['user:read', 'user:create', 'user:update'])]
-    #[Assert\NotBlank]
-    private array $roles = [];
+    // #[Assert\NotBlank]
+    private array $roles = ['ROLE_USER'];
 
     /**
      * @var string The hashed password
@@ -69,6 +69,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(groups: ['user:create'])]
     #[Groups(['user:create', 'user:update'])]
     private ?string $plainPassword = null;
+
+    #[Assert\Blank]
+    // #[Assert\IsNull]
+    #[Groups(['user:read', 'user:create', 'user:update'])]
+    private ?string $honneypot = null;
 
     #[ORM\ManyToOne(inversedBy: 'user')]
     #[Groups(['user:read', 'user:create', 'user:update'])]
@@ -106,7 +111,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 50)]
     #[Groups(['user:read', 'user:create', 'user:update'])]
-    #[Assert\NotBlank]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -160,7 +164,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        // $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }
@@ -198,6 +202,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    public function getHonneypot(): ?string
+    {
+        return $this->honneypot;
+    }
+
+    public function setHonneypot(?string $honneypot): self
+    {
+        $this->honneypot = $honneypot;
 
         return $this;
     }

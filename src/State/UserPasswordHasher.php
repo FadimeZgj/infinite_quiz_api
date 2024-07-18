@@ -33,9 +33,9 @@ final class UserPasswordHasher implements ProcessorInterface
             throw new \InvalidArgumentException('Firstname is required.');
         }
 
-        if (!$data->getLastname()) {
-            throw new \InvalidArgumentException('Lastname is required.');
-        }
+        // if (!$data->getLastname()) {
+        //     throw new \InvalidArgumentException('Lastname is required.');
+        // }
 
         if ($data->getPlainPassword()) {
             $hashedPassword = $this->passwordHasher->hashPassword(
