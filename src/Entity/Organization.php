@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\OrganizationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
 #[ApiResource]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'exact', 'country' => 'exact'])]
 class Organization
 {
     #[ORM\Id]
@@ -25,6 +28,8 @@ class Organization
     #[ORM\Column(length: 50, nullable: true)]
     #[Assert\NotBlank]
     private ?string $country = null;
+
+    private $owner;
 
     /**
      * @var Collection<int, User>
@@ -93,6 +98,17 @@ class Organization
             }
         }
 
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
         return $this;
     }
 }
