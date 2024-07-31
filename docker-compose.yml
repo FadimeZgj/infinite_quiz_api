@@ -1,0 +1,49 @@
+services:
+  angular:
+    build:
+      context: ../infinite_quiz
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200" 
+    depends_on:
+      - symfony
+    volumes:
+      - ../infinite_quiz:/app 
+      
+  symfony:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000" 
+    environment:
+      DATABASE_URL: mysql://symfony:symfony@mysql:3306/infinite_quiz_api?serverVersion=8&charset=utf8mb4
+    depends_on:
+      - mysql
+    volumes:
+      - .:/app  
+
+  mysql:
+    image: mysql:latest 
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: infinite_quiz_api
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+
