@@ -13,3 +13,5 @@ php bin/console doctrine:migrations:migrate --no-interaction
 
 # Lancer le serveur web interne de Symfony
 php -S 0.0.0.0:8000 -t ./public
+
+exec "$@"

@@ -8,7 +8,9 @@ services:
     depends_on:
       - symfony
     volumes:
-      - ../infinite_quiz:/app 
+      - ../infinite_quiz:/var/www/html/infinite_quiz
+      # pour éviter les conflits lié au node_modules :
+      - /var/www/html/infinite_quiz/node_modules
       
   symfony:
     build:
@@ -17,11 +19,12 @@ services:
     ports:
       - "8000:8000" 
     environment:
-      DATABASE_URL: mysql://symfony:symfony@mysql:3306/infinite_quiz_api?serverVersion=8&charset=utf8mb4
+      DATABASE_URL: mysql://infinite:infinite@mysql:3306/infinite_quiz_api?serverVersion=8&charset=utf8mb4
     depends_on:
       - mysql
     volumes:
-      - .:/app  
+      - .:/var/www/html/infinite_quiz_api
+    entrypoint: /usr/local/bin/docker-entrypoint.sh
 
   mysql:
     image: mysql:latest 
@@ -30,8 +33,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: infinite_quiz_api
-      MYSQL_USER: symfony
-      MYSQL_PASSWORD: symfony
+      MYSQL_USER: infinite
+      MYSQL_PASSWORD: infinite
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
