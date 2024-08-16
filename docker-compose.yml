@@ -28,6 +28,7 @@ services:
 
   mysql:
     image: mysql:latest 
+    command: --innodb-buffer-pool-size=512M
     volumes:
       - mysql_data:/var/lib/mysql
     environment:
@@ -35,7 +36,7 @@ services:
       MYSQL_DATABASE: infinite_quiz_api
       MYSQL_USER: infinite
       MYSQL_PASSWORD: infinite
-    command: --innodb-buffer-pool-size=512M
+    
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
