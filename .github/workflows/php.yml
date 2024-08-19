@@ -56,12 +56,13 @@ jobs:
         wget https://get.symfony.com/cli/installer -O - | bash
         export PATH="$HOME/.symfony5/bin:$PATH"
         symfony server:ca:install
-        symfony serve -d
+        symfony serve -d --no-tls
       shell: bash
 
     - name: Set up database
       run: |
         php bin/console doctrine:database:create --env=test
+        php bin/console doctrine:schema:update --force --env=test
       env:
         DATABASE_URL: "mysql://root:root@127.0.0.1:3306/test_db"
 
@@ -80,9 +81,9 @@ jobs:
     - name: Run Newman Tests
       run: |
         npm install -g newman
-        newman run postman/postman_collection.json -e postman/postman_environment.json
+        newman run postman/postman_collection.json -e postman/postman_environment.json --insecure
       shell: bash
 
     - name: Clean up generated keys
       if: always()
-      run: rm -rf certs/
+      run: rm -rf config/jwt/
