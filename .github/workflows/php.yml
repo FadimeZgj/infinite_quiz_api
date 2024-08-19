@@ -19,7 +19,7 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_db
+          MYSQL_DATABASE: infinite_quiz_api
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -63,7 +63,7 @@ jobs:
       run: |
         php bin/console doctrine:database:create --env=test
       env:
-        DATABASE_URL: "mysql://root:root@127.0.0.1:3306/test_db"
+        DATABASE_URL: "mysql://root:root@127.0.0.1:3306/infinite_quiz_api"
 
     - name: Generate SSL Keys
       run: |
