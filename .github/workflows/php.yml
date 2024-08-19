@@ -59,10 +59,9 @@ jobs:
 
     - name: Generate SSL Keys
       run: |
-        mkdir -p certs
-        openssl genpkey -algorithm RSA -out certs/test_private.key -pkeyopt rsa_keygen_bits:2048
-        openssl rsa -pubout -in certs/test_private.key -out certs/test_public.key
-        openssl req -new -x509 -key certs/test_private.key -out certs/test_cert.crt -days 365 -subj "/CN=localhost"
+        mkdir config/jwt
+        openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
+        openssl pkey -in config/jwt/private.pem -out config/jwt/public_test.pem -pubout
       shell: bash
 
     - name: Start PHP server
@@ -77,9 +76,7 @@ jobs:
     - name: Run Newman Tests
       run: |
         npm install -g newman
-        newman run postman/postman_collection.json -e postman/postman_environment.json \
-          --global-var "ssl_cert=$(cat certs/test_cert.crt)" \
-          --global-var "ssl_key=$(cat certs/test_private.key)"
+        newman run postman/postman_collection.json -e postman/postman_environment.json
       shell: bash
 
     - name: Clean up generated keys
