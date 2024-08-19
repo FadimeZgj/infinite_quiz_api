@@ -14,6 +14,16 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
     - uses: actions/checkout@v4
 
@@ -21,6 +31,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.3.6'
+        extensions: pdo_mysql
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
@@ -37,15 +48,28 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
+    - name: Wait for MySQL to be ready
+      run: sleep 15
+
+    - name: Set up database
+      run: |
+        php bin/console doctrine:database:create --env=test
+        php bin/console doctrine:schema:update --force --env=test
+      env:
+        DATABASE_URL: "mysql://root:root@127.0.0.1:3306/test_db"
+
     - name: Generate SSL Keys
       run: |
         mkdir -p certs
-        # Générer la clé privée
         openssl genpkey -algorithm RSA -out certs/test_private.key -pkeyopt rsa_keygen_bits:2048
-        # Générer la clé publique
         openssl rsa -pubout -in certs/test_private.key -out certs/test_public.key
-        # Générer un certificat auto-signé
         openssl req -new -x509 -key certs/test_private.key -out certs/test_cert.crt -days 365 -subj "/CN=localhost"
+      shell: bash
+
+    - name: Start PHP server
+      run: |
+        php -S 127.0.0.1:8000 -t public &
+        sleep 5
       shell: bash
 
     - name: Run PHP test suite
