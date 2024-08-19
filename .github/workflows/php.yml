@@ -65,7 +65,7 @@ jobs:
         php bin/console doctrine:database:create
         php bin/console doctrine:migrations:migrate --no-interaction
       env:
-        DATABASE_URL: "mysql://infinite:infinite@127.0.0.1:3306/infinite_quiz_api"
+        DATABASE_URL: "mysql://root:root@127.0.0.1:3306/infinite_quiz_api"
 
     - name: Generate SSL Keys
       run: |
