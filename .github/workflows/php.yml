@@ -11,67 +11,34 @@ permissions:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Set up PHP
+    - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.4'
-        extensions: zip, pdo_mysql
+        php-version: '8.3.6'
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y git libzip-dev npm wget
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
 
-    - name: Install Composer
-      run: |
-        curl -sSk https://getcomposer.org/installer | php -- --disable-tls
-        sudo mv composer.phar /usr/local/bin/composer
-
-    - name: Install Symfony CLI
-      run: |
-        wget https://get.symfony.com/cli/installer -O - | bash
-        sudo mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
 
     - name: Install dependencies
-      run: composer install
+      run: composer install --prefer-dist --no-progress
 
-    - name: Generate SSL Keys
-      run: |
-        mkdir -p config/jwt
-        mv ./config/jwt/private_test.pem ./config/jwt/private.pem
-        mv ./config/jwt/public_test.pem ./config/jwt/public.pem
+    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
+    # Docs: https://getcomposer.org/doc/articles/scripts.md
 
-    - name: Start Symfony server
-      run: |
-        symfony server:ca:install
-        symfony serve -d
-
-    - name: Set up database
-      run: |
-        php bin/console doctrine:database:create --env=test
-        php bin/console doctrine:migrations:migrate --env=test --no-interaction
-      env:
-        DATABASE_URL: "mysql://infinite:infinite@127.0.0.1:3306/infinite_quiz_api_test"
-
-    - name: Generate JWT Token
-      id: get-jwt
-      run: |
-        RESPONSE=$(curl -X POST http://127.0.0.1:8000/api/login_check -H "Content-Type: application/json" -d '{"username":"go@jo.fr","password":"azerty"}')
-        JWT=$(echo "$RESPONSE" | jq -r '.token')
-        echo "JWT=$JWT" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Run Newman Tests
-      run: |
-        newman run ./postman/postman_collection.json -e ./postman/postman_environment.json --env-var "jwt=${{ env.JWT }}"
-      shell: bash
-
-    - name: Clean up generated keys
-      if: always()
-      run: rm -rf config/jwt/
+    - name: Run test suite
+      run: composer run-script test
