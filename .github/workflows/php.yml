@@ -51,6 +51,12 @@ jobs:
     - name: Wait for MySQL to be ready
       run: sleep 15
 
+    - name: Start Symfony server
+      run: |
+        wget https://get.symfony.com/cli/installer -O - | bash
+        symfony serve
+      shell: bash
+
     - name: Set up database
       run: |
         php bin/console doctrine:database:create --env=test
@@ -64,11 +70,6 @@ jobs:
         openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout -passin pass:$JWT_PASSPHRASE
       env:
         JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
-      shell: bash
-
-    - name: Start Symfony server
-      run: |
-        symfony serve
       shell: bash
 
     - name: Run PHP test suite
