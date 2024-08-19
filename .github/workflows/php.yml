@@ -74,13 +74,13 @@ jobs:
         JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
       shell: bash
 
-      - name: Create User
-        run: |
-          mysql -u root -proot -h 127.0.0.1 infinite_quiz_api <<EOF
-          INSERT INTO user (email, password, firstname, lastname, roles) VALUES 
-          ('go@jo.fr', '$2y$10$Wrz/OKbnpBUBtP2fOU3lwu54J6meJXkMiknVehtCRUJz8zX18JslS', 'John', 'Doe', '["ROLE_ADMIN"]');
-          EOF
-        shell: bash
+    - name: Create User
+      run: |
+        mysql -u root -proot -h 127.0.0.1 infinite_quiz_api <<EOF
+        INSERT INTO user (email, password, firstname, lastname, roles) VALUES 
+        ('go@jo.fr', '$2y$10$Wrz/OKbnpBUBtP2fOU3lwu54J6meJXkMiknVehtCRUJz8zX18JslS', 'John', 'Doe', '["ROLE_ADMIN"]');
+        EOF
+      shell: bash
 
     - name: Run PHP test suite
       run: composer run-script test
