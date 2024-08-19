@@ -87,12 +87,13 @@ jobs:
     - name: Run PHP test suite
       run: composer run-script test
 
-    - name: Get JWT Token
+   - name: Get JWT Token
       id: get-jwt
       run: |
-        JWT=$(curl -X POST http://127.0.0.1:8000/api/login_check -H "Content-Type: application/json" -d '{"username":"go@jo.fr","password":"azerty"}' | jq -r '.token')
+        RESPONSE=$(curl -X POST http://127.0.0.1:8000/api/login_check -H "Content-Type: application/json" -d '{"username":"go@jo.fr","password":"azerty"}')
+        echo "JWT: $JWT"
         echo "JWT=$JWT" >> $GITHUB_ENV
-
+      shell: bash
 
     - name: Run Newman Tests
       run: |
