@@ -51,15 +51,9 @@ jobs:
     - name: Wait for MySQL to be ready
       run: sleep 15
 
-    - name: Drop and recreate database
+    - name: Set up database
       run: |
-        echo "DROP DATABASE IF EXISTS test_db;" | mysql -u root -proot -h 127.0.0.1
-        echo "CREATE DATABASE test_db;" | mysql -u root -proot -h 127.0.0.1
-      env:
-        DATABASE_URL: "mysql://root:root@127.0.0.1:3306/test_db"
-
-    - name: Run database migrations
-      run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
+        php bin/console doctrine:database:create --env=test
       env:
         DATABASE_URL: "mysql://root:root@127.0.0.1:3306/test_db"
 
