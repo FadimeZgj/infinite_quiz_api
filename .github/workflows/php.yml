@@ -1,27 +1,77 @@
-image: php:7.4-cli
+name: PHP Composer
 
-before_script:
-  - apt-get update && apt-get install -y git libzip-dev npm wget
-  - curl -sSk https://getcomposer.org/installer | php -- --disable-tls && mv composer.phar /usr/local/bin/composer
-  - docker-php-ext-install zip
-  - wget https://get.symfony.com/cli/installer -O - | bash
-  - mv /root/.symfony/bin/symfony /usr/local/bin/symfony
-  - npm install -g newman
-  - composer install
-  - mv ./config/jwt/private_test.pem ./config/jwt/private.pem && mv ./config/jwt/public_test.pem ./config/jwt/public.pem 
-  - symfony server:ca:install && symfony serve -d
-  - php bin/console doctrine:database:create --env=test
-  - php bin/console doctrine:migration:migrate --env=test --no-interaction
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
 
-cache:
-  paths:
-    - vendor/
+permissions:
+  contents: read
 
-stages:
-  - TestAPI
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-Newman:
-  stage: TestAPI
-  script:
-    - newman run ./postman/postman_collection.json -e ./postman/postman_environment.json 
-  allow_failure: false
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        extensions: zip, pdo_mysql
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git libzip-dev npm wget
+
+    - name: Install Composer
+      run: |
+        curl -sSk https://getcomposer.org/installer | php -- --disable-tls
+        sudo mv composer.phar /usr/local/bin/composer
+
+    - name: Install Symfony CLI
+      run: |
+        wget https://get.symfony.com/cli/installer -O - | bash
+        sudo mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
+
+    - name: Install dependencies
+      run: composer install
+
+    - name: Generate SSL Keys
+      run: |
+        mkdir -p config/jwt
+        mv ./config/jwt/private_test.pem ./config/jwt/private.pem
+        mv ./config/jwt/public_test.pem ./config/jwt/public.pem
+
+    - name: Start Symfony server
+      run: |
+        symfony server:ca:install
+        symfony serve -d
+
+    - name: Set up database
+      run: |
+        php bin/console doctrine:database:create --env=test
+        php bin/console doctrine:migrations:migrate --env=test --no-interaction
+      env:
+        DATABASE_URL: "mysql://infinite:infinite@127.0.0.1:3306/infinite_quiz_api_test"
+
+    - name: Generate JWT Token
+      id: get-jwt
+      run: |
+        RESPONSE=$(curl -X POST http://127.0.0.1:8000/api/login_check -H "Content-Type: application/json" -d '{"username":"go@jo.fr","password":"azerty"}')
+        JWT=$(echo "$RESPONSE" | jq -r '.token')
+        echo "JWT=$JWT" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Run Newman Tests
+      run: |
+        newman run ./postman/postman_collection.json -e ./postman/postman_environment.json --env-var "jwt=${{ env.JWT }}"
+      shell: bash
+
+    - name: Clean up generated keys
+      if: always()
+      run: rm -rf config/jwt/
