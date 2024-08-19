@@ -55,7 +55,8 @@ jobs:
       run: |
         wget https://get.symfony.com/cli/installer -O - | bash
         export PATH="$HOME/.symfony5/bin:$PATH"
-        symfony serve
+        server:ca:install
+        symfony serve -d
       shell: bash
 
     - name: Set up database
