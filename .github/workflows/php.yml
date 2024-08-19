@@ -98,7 +98,9 @@ jobs:
     - name: Run Newman Tests
       run: |
         npm install -g newman
-        newman run postman/postman_collection.json -e postman/postman_environment.json --insecure
+        newman run postman/postman_collection.json -e postman/postman_environment.json --insecure \
+          -e postman/postman_environment.json \
+          --env-var "jwt=${{ env.JWT }}"
       shell: bash
 
     - name: Clean up generated keys
