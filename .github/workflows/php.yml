@@ -37,8 +37,28 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
+    - name: Generate SSL Keys
+      run: |
+        mkdir -p certs
+        # Générer la clé privée
+        openssl genpkey -algorithm RSA -out certs/test_private.key -pkeyopt rsa_keygen_bits:2048
+        # Générer la clé publique
+        openssl rsa -pubout -in certs/test_private.key -out certs/test_public.key
+        # Générer un certificat auto-signé
+        openssl req -new -x509 -key certs/test_private.key -out certs/test_cert.crt -days 365 -subj "/CN=localhost"
+      shell: bash
 
-    - name: Run test suite
+    - name: Run PHP test suite
       run: composer run-script test
+
+    - name: Run Newman Tests
+      run: |
+        npm install -g newman
+        newman run postman/postman_collection.json -e postman/postman_environment.json \
+          --global-var "ssl_cert=$(cat certs/test_cert.crt)" \
+          --global-var "ssl_key=$(cat certs/test_private.key)"
+      shell: bash
+
+    - name: Clean up generated keys
+      if: always()
+      run: rm -rf certs/
