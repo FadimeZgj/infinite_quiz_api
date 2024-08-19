@@ -19,7 +19,6 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: infinite_quiz_api
           MYSQL_USER: infinite
           MYSQL_PASSWORD: infinite
         ports:
@@ -65,8 +64,6 @@ jobs:
       run: |
         php bin/console doctrine:database:create
         php bin/console doctrine:migrations:migrate
-        php bin/console doctrine:database:create --env=test
-        php bin/console doctrine:migrations:migrate --env=test
       env:
         DATABASE_URL: "mysql://root:root@127.0.0.1:3306/infinite_quiz_api"
 
