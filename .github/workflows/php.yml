@@ -1,106 +1,27 @@
-name: PHP Composer
+image: php:8.3-cli
 
-on:
-  push:
-    branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
+before_script:
+    - apt-get update && apt-get install -y git libzip-dev npm wget
+    - curl -sSk https://getcomposer.org/installer | php -- --disable-tls && mv composer.phar /usr/local/bin/composer
+    - docker-php-ext-install zip
+    - wget https://get.symfony.com/cli/installer -O - | bash
+    - mv /root/.symfony/bin/symfony /usr/local/bin/symfony
+    - npm install -g newman
+    - composer install
+    - mv ./config/jwt/private_test.pem ./config/jwt/private.pem && mv ./config/jwt/public_test.pem ./config/jwt/public.pem 
+    - symfony server:ca:install && symfony serve -d
+    - php bin/console doctrine:database:create --env=test
+    - php bin/console doctrine:migration:migrate --env=test --no-interaction
 
-permissions:
-  contents: read
+cache:
+    paths:
+        - vendor/
 
-jobs:
-  build:
+stages:
+    - TestAPI
 
-    runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: infinite
-          MYSQL_PASSWORD: infinite
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3.6'
-        extensions: pdo_mysql
-
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
-
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
-
-    - name: Wait for MySQL to be ready
-      run: sleep 15
-
-    - name: Start Symfony server
-      run: |
-        wget https://get.symfony.com/cli/installer -O - | bash
-        export PATH="$HOME/.symfony5/bin:$PATH"
-        symfony server:ca:install
-        symfony serve -d --no-tls
-      shell: bash
-
-    - name: Set up database
-      run: |
-        php bin/console doctrine:database:create
-        php bin/console doctrine:migrations:migrate --no-interaction
-      env:
-        DATABASE_URL: "mysql://root:root@127.0.0.1:3306/infinite_quiz_api"
-
-    - name: Generate SSL Keys
-      run: |
-        mkdir -p config/jwt
-        openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096 -pass pass:$JWT_PASSPHRASE
-        openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout -passin pass:$JWT_PASSPHRASE
-      env:
-        JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
-      shell: bash
-
-    - name: Create User
-      run: |
-        mysql -u root -proot -h 127.0.0.1 infinite_quiz_api <<EOF
-        INSERT INTO user (email, password, firstname, lastname, roles) VALUES 
-        ('go@jo.fr', '$2y$10$Wrz/OKbnpBUBtP2fOU3lwu54J6meJXkMiknVehtCRUJz8zX18JslS', 'John', 'Doe', '["ROLE_ADMIN"]');
-        EOF
-      shell: bash
-
-    - name: Run PHP test suite
-      run: composer run-script test
-
-    - name: Get JWT Token
-      id: get-jwt
-      run: |
-        RESPONSE=$(curl -X POST http://127.0.0.1:8000/api/login_check -H "Content-Type: application/json" -d '{"username":"go@jo.fr","password":"azerty"}')
-        echo "JWT: $JWT"
-        echo "JWT=$JWT" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Run Newman Tests
-      run: |
-        npm install -g newman
-        newman run postman/postman_collection.json -e postman/postman_environment.json --insecure --env-var "jwt=${{ env.JWT }}"
-      shell: bash
-
-    - name: Clean up generated keys
-      if: always()
-      run: rm -rf config/jwt/
+Newman:
+    stage: TestAPI
+    script:
+        - newman run ./postman/postman_collection.json -e ./postman/postman_environment.json 
+    allow_failure: false
