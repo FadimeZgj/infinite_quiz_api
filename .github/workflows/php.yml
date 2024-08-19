@@ -54,6 +54,8 @@ jobs:
     - name: Start Symfony server
       run: |
         wget https://get.symfony.com/cli/installer -O - | bash
+        export PATH="$HOME/.symfony5/bin:$PATH"
+        symfony --version
         symfony serve
       shell: bash
 
