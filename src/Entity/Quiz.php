@@ -12,8 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiResource(order: ['id' => 'DESC'])]
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
-#[ApiResource]
 #[ApiFilter(SearchFilter::class, properties: ['username' => 'exact'])]
 class Quiz
 {
