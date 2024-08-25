@@ -9,9 +9,8 @@ services:
       - symfony
     volumes:
       - ../infinite_quiz:/var/www/html/infinite_quiz
-      # pour éviter les conflits lié au node_modules :
       - /var/www/html/infinite_quiz/node_modules
-      
+
   symfony:
     build:
       context: .
@@ -19,7 +18,7 @@ services:
     ports:
       - "8000:8000" 
     environment:
-      DATABASE_URL: mysql://infinite:infinite@mysql:3306/infinite_quiz_api?serverVersion=8&charset=utf8mb4
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       - mysql
     volumes:
@@ -32,23 +31,21 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: infinite_quiz_api
-      MYSQL_USER: infinite
-      MYSQL_PASSWORD: infinite
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
       - "8080:80"
     environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: root
+      PMA_HOST: ${PMA_HOST}
+      PMA_PORT: ${PMA_PORT}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     depends_on:
       - mysql
 
 volumes:
   mysql_data:
-
