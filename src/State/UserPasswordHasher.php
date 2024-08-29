@@ -28,15 +28,7 @@ final class UserPasswordHasher implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): User
     {
-        // Check if all required fields are set
-        if (!$data->getFirstname()) {
-            throw new \InvalidArgumentException('Firstname is required.');
-        }
-
-        // if (!$data->getLastname()) {
-        //     throw new \InvalidArgumentException('Lastname is required.');
-        // }
-
+        
         if ($data->getPlainPassword()) {
             $hashedPassword = $this->passwordHasher->hashPassword(
                 $data,
