@@ -4044,7 +4044,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"question\": \"question 2\",\r\n    \"quiz\": \"api/quizzes/1\"\r\n\r\n}",
+							"raw": "{\r\n    \"question\": \"question 2\",\r\n    \"quiz\": \"api/quizzes/2\"\r\n\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4272,7 +4272,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"response\": \"question 4\",\r\n  \"questions\": [\r\n    \"api/questions/1\"\r\n  ],\r\n  \"correct\": true\r\n}",
+							"raw": "{\r\n  \"response\": \"question 4\",\r\n  \"questions\": [\r\n    \"api/questions/2\"\r\n  ],\r\n  \"correct\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4732,7 +4732,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"quizId\": 1,\r\n  \"teamId\": 1,\r\n  \"playerId\": 1,\r\n    \"uuid\": \"f9b8ba65-6155-4a9e-8b23-d97ed7c94ace\",\r\n  \"secretCode\": 1234,\r\n  \"teamScore\": 23,\r\n  \"playerScore\": 34\r\n}",
+							"raw": "{\r\n  \"quizId\": 2,\r\n  \"teamId\": 1,\r\n  \"playerId\": 1,\r\n    \"uuid\": \"f9b8ba65-6155-4a9e-8b23-d97ed7c94ace\",\r\n  \"secretCode\": 1234,\r\n  \"teamScore\": 23,\r\n  \"playerScore\": 34\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
